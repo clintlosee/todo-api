@@ -69,6 +69,44 @@ app.post('/todos', function(req, res) {
     res.json(body);
 });
 
+app.delete('/todos/:id', function(req, res) {
+    var todoId = parseInt(req.params.id, 10);
+    var match = _.findWhere(todosArr, {id: todoId});
+
+    if (!match) {
+        return res.status(404).json({"error": "No todo found with that id"});
+    } else {
+        todosArr = _.without(todosArr, match);
+        res.json(match);
+    }
+});
+
+app.put('/todos/:id', function(req, res) {
+    var todoId = parseInt(req.params.id, 10);
+    var match = _.findWhere(todosArr, {id: todoId});
+    var body = _.pick(req.body, 'description', 'completed');
+    var validatedTodos = {};
+
+    if (!match) {
+        return res.status(404).send();
+    }
+
+    if (body.hasOwnProperty('completed') && _.isBoolean(body.completed)) {
+        validatedTodos.completed = body.completed;
+    } else if (body.hasOwnProperty('completed')) {
+        return res.status(400).send();
+    }
+
+    if (body.hasOwnProperty('description') && _.isString(body.description)) {
+        validatedTodos.description = body.description;
+    } else if (body.hasOwnProperty('description')) {
+        return res.status(400).send();
+    }
+
+    _.extend(match, validatedTodos);
+    res.json(match);
+});
+
 app.listen(port, function() {
     console.log('Magic happens on port ' + port);
 });
