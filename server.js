@@ -1,9 +1,10 @@
-var express = require('express'),
-    bodyParser = require('body-parser'),
-    _       = require('underscore'),
-    app     = express(),
-    port    = process.env.PORT || 8000,
-    todos   = [{
+var express     = require('express'),
+    bodyParser  = require('body-parser'),
+    _           = require('underscore');
+
+var app         = express(),
+    port        = process.env.PORT || 8000,
+    todos       = [{
         id: 1,
         description: 'Meet wife for lunch',
         completed: false
