@@ -137,28 +137,16 @@ app.post('/users', function(req, res) {
 // POST /users/login
 app.post('/users/login', function(req, res) {
 	var body = _.pick(req.body, 'email', 'password');
-	
-	if (typeof body.email !== 'string' || typeof body.password !== 'string') {
-		return res.status(400).send();
-	}
-	
-	db.user.findOne({
-		where: {
-			email: body.email
-		}
-	}).then(function(user) {
-		if (!user || !bcrypt.compareSync(body.password, user.get('password_hash'))) {
-			return res.status(401).send();
-		}
-		
-		res.json(user.toPublicJSON());
-	}, function(e) {
-		res.status(500).send();
-	});
+
+    db.user.authenticate(body).then(function(user) {
+        res.json(user.toPublicJSON());
+    }, function() {
+        res.send(401).send();
+    });
 });
 
 
-db.sequelize.sync().then(function() {
+db.sequelize.sync({force: true}).then(function() {
     app.listen(port, function() {
         console.log('Magic happens on port ' + port);
     });
